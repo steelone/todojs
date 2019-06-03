@@ -1,56 +1,62 @@
-// Create a "close" button and append it to each list item
-var myNodelist = document.getElementsByTagName("LI");
-var i;
-for (i = 0; i < myNodelist.length; i++) {
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  myNodelist[i].appendChild(span);
-}
+$(function (){
 
-// Click on a close button to hide the current list item
-var close = document.getElementsByClassName("close");
-var i;
-for (i = 0; i < close.length; i++) {
-  close[i].onclick = function() {
-    var div = this.parentElement;
-    div.style.display = "none";
-  }
-}
+    let array=[];
+    const $tasksList = $("#tasksList");
+    const $tasksInput = $("#tasksInput");
+    const $notification = $("#notification");
 
-// Add a "checked" symbol when clicking on a list item
-var list = document.querySelector('ul');
-list.addEventListener('click', function(ev) {
-  if (ev.target.tagName === 'LI') {
-    ev.target.classList.toggle('checked');
-  }
-}, false);
-
-// Create a new list item when clicking on the "Add" button
-function newElement() {
-  var li = document.createElement("li");
-  var inputValue = document.getElementById("myInput").value;
-  var t = document.createTextNode(inputValue);
-  li.appendChild(t);
-  if (inputValue === '') {
-    alert("You must write something!");
-  } else {
-    li.className = "list-group-item";
-    document.getElementById("myUL").appendChild(li);
-  }
-  document.getElementById("myInput").value = "";
-
-  var span = document.createElement("SPAN");
-  var txt = document.createTextNode("\u00D7");
-  span.className = "close";
-  span.appendChild(txt);
-  li.appendChild(span);
-
-  for (i = 0; i < close.length; i++) {
-    close[i].onclick = function() {
-      var div = this.parentElement;
-      div.style.display = "none";
+    const displayNotification = function() {
+        if (!$tasksList.children().length) {
+            $notification.fadeIn("fast");
+        } else {
+            $notification.css("display", "none")
+        }
     }
-  }
-}
+    $(document).on('keypress',function(e) {
+        if(e.which == 13){//Enter key pressed
+            $('#taskAdd').click();//Trigger search button click event
+        }
+    });
+    $("#taskAdd").on("click", function(){
+        // console.log($tasksList);
+        // console.log($tasksInput.val());
+        if(!$tasksInput.val()) {return false;}
+
+        // array.push($tasksInput.val());
+        array.push({status: false,val: $tasksInput.val()});
+        console.log(array);
+
+        $tasksList.append("<li class='list-group-item'><input type='checkbox'/>" + $tasksInput.val() + "<button id='delete' class='delete btn btn-danger'>x</button></li>")
+
+        $tasksInput.val("");
+
+        displayNotification();
+
+        $(":checkbox").change(function(){
+            var $parent = $(this).parent();
+            if(this.checked) {
+                $parent.css("text-decoration", "line-through");
+                // const arrid = array.element.id;
+                // array.forEach(element => {
+                //     if(element.id == arrid) {
+                //         element.status = true;
+                //     }
+                //     console.log(element.status);
+                // });
+            } else {
+                $parent.css("text-decoration", "none");
+            }
+        })
+
+        $(".delete").on("click", function(){
+            var $parent = $(this).parent();
+            console.log($parent);
+            $parent.css("display", "none");
+        })
+
+        setTimeout(function(){
+            $parent.remove();
+            displayNotification();
+        }, 295);
+    })
+})
