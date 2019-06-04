@@ -45,8 +45,11 @@ $(function (){
         $(":checkbox").change(function(){
             let $parent = $(this).parent();
             let id = $parent.attr('id');
+            // let css = $parent.attr('css');
             console.log( array );
             console.log( this.id );
+            console.log( $parent );
+            let checkboxId = this.id;
     
             if(this.checked) { // checked
                 // objArray = [ { foo: 1, bar: 2}, { foo: 3, bar: 4}, { foo: 5, bar: 6} ];
@@ -54,13 +57,19 @@ $(function (){
                 // console.log( result );
                 // console.log( 'UNIQ:'+uniq );
                 // console.log( 'ID:'+id );
-                
                 array.forEach(element => {
                     $.each( element, function( key, value ) {
-                        if (element.id == id){
+                        if (checkboxId == 'selectAll'){
+                            // need find all div="id"
+                            // element.css("text-decoration", "line-through");
                             element.checked = true;
                         }
-                        // console.log( key + ": " + value );
+                        else {
+                            if (element.id == id){
+                                element.checked = true;
+                            }
+                            // console.log( key + ": " + value );
+                        }
                     });
                 });
 
@@ -71,8 +80,13 @@ $(function (){
                                 
                 array.forEach(element => {
                     $.each( element, function( key, value ) {
-                        if (element.id == id){
+                        if (checkboxId == 'selectAll'){
                             element.checked = false;
+                        }
+                        else { 
+                            if (element.id == id){
+                                element.checked = false;
+                            }
                         }
                         // console.log( key + ": " + value );
                     });
