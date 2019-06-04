@@ -29,6 +29,7 @@ $(function (){
     
     let i = 0;
     $("#taskAdd").on("click", function(){
+        
         const value=_.escape($('#tasksInput').val());
         checkInput(value);
         
@@ -50,11 +51,13 @@ $(function (){
             console.log( this.id );
             console.log( $parent );
             let checkboxId = this.id;
-    
+            
+            let LiChecked = array.map(a => a.checked);
+            console.log( LiChecked );
+
             if(this.checked) { // checked
                 // objArray = [ { foo: 1, bar: 2}, { foo: 3, bar: 4}, { foo: 5, bar: 6} ];
-                // let result = array.map(a => a.checked);
-                // console.log( result );
+
                 // console.log( 'UNIQ:'+uniq );
                 // console.log( 'ID:'+id );
                 array.forEach(element => {
@@ -93,6 +96,9 @@ $(function (){
                 });
             }
         })
+        let allLiId = array.map(a => a.id);
+        console.log( allLiId );
+        
 
         $(".delete").on("click", function(){
             let $parent = $(this).parent();
