@@ -17,46 +17,79 @@ $(function (){
             $('#taskAdd').click();//Trigger search button click event
         }
     });
+
+    var checkInput = function(value){
+        // console.log('VALUE:'+value);
+        let empty=+value;
+        if(empty == 0) {
+            // alert('Incorrect data');
+            return true;
+        } else {return false;}
+    };
+    
+    let i = 0;
     $("#taskAdd").on("click", function(){
-        // console.log($tasksList);
-        // console.log($tasksInput.val());
-        if(!$tasksInput.val()) {return false;}
-
-        // array.push($tasksInput.val());
-        array.push({status: false,val: $tasksInput.val()});
-        console.log(array);
-
-        $tasksList.append("<li class='list-group-item'><input type='checkbox'/>" + $tasksInput.val() + "<button id='delete' class='delete btn btn-danger'>x</button></li>")
+        const value=_.escape($('#tasksInput').val());
+        checkInput(value);
+        
+        if(!value || checkInput(value) === true) {return false;}
+        const uniq = Math.floor((Math.random() * 10000) + 1);
+        array.push({ id: uniq, value: value, checked:false});
+        $tasksList.append("<li id="+uniq+" class='list-group-item'><input id='selectLi' type='checkbox'/>" + value + "<button id='delete' class='delete btn btn-danger'>x</button></li>")
+        // array[id].checked = true;
 
         $tasksInput.val("");
 
         displayNotification();
 
         $(":checkbox").change(function(){
-            var $parent = $(this).parent();
-            if(this.checked) {
+            let $parent = $(this).parent();
+            let id = $parent.attr('id');
+            console.log( array );
+            console.log( this.id );
+    
+            if(this.checked) { // checked
+                // objArray = [ { foo: 1, bar: 2}, { foo: 3, bar: 4}, { foo: 5, bar: 6} ];
+                // let result = array.map(a => a.checked);
+                // console.log( result );
+                // console.log( 'UNIQ:'+uniq );
+                // console.log( 'ID:'+id );
+                
+                array.forEach(element => {
+                    $.each( element, function( key, value ) {
+                        if (element.id == id){
+                            element.checked = true;
+                        }
+                        // console.log( key + ": " + value );
+                    });
+                });
+
                 $parent.css("text-decoration", "line-through");
-                // const arrid = array.element.id;
-                // array.forEach(element => {
-                //     if(element.id == arrid) {
-                //         element.status = true;
-                //     }
-                //     console.log(element.status);
-                // });
-            } else {
+                    
+            } else { // cancel checked
                 $parent.css("text-decoration", "none");
+                                
+                array.forEach(element => {
+                    $.each( element, function( key, value ) {
+                        if (element.id == id){
+                            element.checked = false;
+                        }
+                        // console.log( key + ": " + value );
+                    });
+                });
             }
         })
 
         $(".delete").on("click", function(){
-            var $parent = $(this).parent();
-            console.log($parent);
+            let $parent = $(this).parent();
+            // console.log($parent);
             $parent.css("display", "none");
+            setTimeout(function(){
+                $parent.remove();
+                displayNotification();
+            }, 295);
         })
 
-        setTimeout(function(){
-            $parent.remove();
-            displayNotification();
-        }, 295);
     })
+
 })
