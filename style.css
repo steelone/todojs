@@ -1,0 +1,15 @@
+.text-decoration-line {
+    text-decoration: line-through !important;
+    background: mediumseagreen;
+}
+
+.edit-input-hide {
+    display: none !important;
+}
+
+.edit-input-show {
+    display: block !important;
+}
+.number {
+    display: block;
+}

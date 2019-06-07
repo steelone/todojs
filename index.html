@@ -4,32 +4,43 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
 
     <title>by Vyacheslav Denisenko</title>
-    <!-- <link rel="stylesheet" href="style.css"> -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="http://underscorejs.ru/underscore-min.js"></script>
+    <script src="lib/jquery-3.4.1.min.js"></script>
+    <script src="lib/popper.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+    <script src="lib/underscore-min.js"></script>
     <script src="script.js"></script>
 </head>
 
 <body>
-<h2>TODO by Vyacheslav Denisenko</h2>
+<h3 class="bg-info text-center">TODO by Vyacheslav Denisenko</h3>
 </br>
 <div id="container" class="form-group">
     <div id="input">
-        <input type="text" id="tasksInput" class="form-control" placeholder="Your task">
-        <button id="taskAdd" class="btn btn-success lg">Add</button>
-        <input id="selectAll" type="checkbox">selectAll</input>
+        <input id="tasks-input" type="text" class="form-control" placeholder="Your task">
+        <button id="task-add" class="btn btn-success lg">Add</button>
+    </div>
+    </br>
+    <div>
+        <input id="checked-all" class="checkbox" type="checkbox">SET ALL as completed</input>
+        <input id="all" type="button" class="btn btn-secondary" value="All">
+        <input id="active" type="button" class="btn btn-primary" value="Active">
+        <input id="completed" type="button" class="btn btn-success" value="Completed">    
+        <input id="delete-completed" type="button" class="btn btn-danger" value="Delete completed">
     </div>
     <div id="tasks">
-        <div id="notification">Task list is empty</div>
-        <ul id="tasksList">
-
+        </br>
+        <div id="notification" class="bg-info text-center">Task list is empty</div>
+        <ul id="tasks-list">
         </ul>
     </div>
+    <nav aria-label="Navigation">
+        <ul id="pagination" class="pagination justify-content-center">
+        </ul>
+    </nav>
 </div>
 </body>
 </html>
