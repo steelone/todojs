@@ -1,314 +1,296 @@
-// $(function (){
 $(document).ready(() => {
+  let currentPage = 1;
+  let todos = [];
+  let filter = 'all';
 
-    let array=[];
-    const TASKS_ON_PAGE = 3;
-    const KEY_ENTER = 13;
-    const $tasksList = $("#tasks-list");
-    const $tasksInput = $("#tasks-input");
-    const $notification = $("#notification");
-    const $pagination = $("#pagination");
-    const $pageLink = $(".page-link");
-    let currentPage = 1;
-    const $checkedAll = $('#checked-all');
-    const $all = $('#all');
-    const $active = $('#active');
-    const $completed = $('#completed');
-    const $deleteCompleted = $('#delete-completed');
-    let filter = 'all';
-    
-    const callCurrentPage = function() {
-        return Math.ceil(filtration().length / TASKS_ON_PAGE);
+  const { _ } = window;
+  const TODOS_ON_PAGE = 5;
+  const KEY_ENTER = 13;
+  const $todosList = $('#todos-list');
+  const $todosInput = $('#todos-input');
+  const $notification = $('#notification');
+  const $pagination = $('#pagination');
+  const $checkedAll = $('#checked-all');
+  const $todoAdd = $('#todo-add');
+  const $all = $('#all');
+  const $active = $('#active');
+  const $completed = $('#completed');
+  const $deleteCompleted = $('#delete-completed');
+
+  const filtration = function() {
+    let filterTodos = [];
+
+    if (filter === 'active') {
+      filterTodos = todos.filter(todo => todo.checked === false);
+    }
+    if (filter === 'completed') {
+      filterTodos = todos.filter(todo => todo.checked === true);
+    }
+    if (filter === 'all') {
+      filterTodos = todos;
     }
 
-    // Message: Task list is empty
-    const displayNotification = function() {
-        if (array.length) {
-            $notification.css("display", "none");
-        }
-    };
-    
-    // KeyPress ENTER
-    $(document).on('keypress', function(e) {
-        if(e.which === KEY_ENTER){//Enter key pressed
-            $('#task-add').click();//Trigger search button click event
-        }
-    });
-    // Accept edit by key 'Enter'
-    // $tasksList.on('keypress', '.editInput', function(e) {
-    $tasksList.on('keypress', '.edit-input', event => {
-        if (event.which === KEY_ENTER) {
-            // alert('SAVE!');
-            // console.log($(event.currentTarget));
-            $(event.currentTarget).blur();
-            
-            // $("input:focus").blur();
-            
-            // $("input:focus").focusout();
-            // $tasksList.on('blur');
-            // blur();
-        }
-    });
+    return filterTodos;
+  };
 
-    // Check your input data
-    const checkInput = function(value){
-        let empty=+value;
-        if(empty == 0) {
-            // alert('Incorrect data');
-            return true;
-        } else {return false;}
-    };
-   
-    // Filtration by checked
-    const filtration = function() {
-        let filterArray = [];
+  const getLastPage = function() {
+    return Math.ceil(filtration().length / TODOS_ON_PAGE);
+  };
 
-        if (filter == 'active') {
-            filterArray = array.filter(task => task.checked === false);
-        }
-        if (filter == 'completed') {
-            filterArray = array.filter(task => task.checked === true);
-        }
-        if (filter == 'all') {
-            filterArray = array;
-        }
-        return filterArray;
-    };
-    
-    $all.click(event => {
-        filter = 'all';
-        currentPage = callCurrentPage();
-        render();
-    })
-    
-    $active.click(event => {
-        filter = 'active';
-        currentPage = callCurrentPage();
-        render();
-    })
+  const callCurrentPage = function() {
+    const firstCondition = filtration().length % TODOS_ON_PAGE === 0;
+    const lastPage = getLastPage();
 
-    $completed.click(event => {
-        filter = 'completed';
-        currentPage = callCurrentPage();
-        render();
-    })
+    if (firstCondition && Number(currentPage) > Number(lastPage)) {
+      currentPage = lastPage;
+    }
+  };
 
-    // On pages
-    const CountOnPages = function() {
-        const allTask = currentPage * TASKS_ON_PAGE;
-        const firstPage = allTask - TASKS_ON_PAGE;
-        const lastPage = firstPage + TASKS_ON_PAGE;
-        const filterTask = filtration();
-        
-        return filterTask.slice(firstPage, lastPage);
-    };
+  const displayNotificationIfTodosEmpty = function() {
+    if (todos.length) {
+      $notification.css('display', 'none');
+    }
+  };
 
-    // RENDER
-    const render = function() {
-        $tasksList.empty();
-        $checkedAll.prop('checked', false);
-        const filterTasks = CountOnPages();
-        let stringForRender = '';
-        
-        filterTasks.forEach(task => {
-            let decor = (task.checked === true) ? 'text-decoration-line':'';
-            let decorEdit = (task.edit === true) ? ' edit-input-show':' edit-input-hide';
-            let value = (task.edit === true) ? '' : `${task.value}`;
-            let decorEditOther = (task.edit === false) ? ' ' : ' edit-input-hide';
-            let autofocus = (task.edit === true) ? 'autofocus' : '';
-            stringForRender += `<li id="${task.id}" class="list-group-item ${decor}">
-                                <input type="text" id="edit-input-${task.id}" class="edit-input ${decorEdit}" value="${task.value}" ${autofocus}/>
-                                <input id="${task.id}" ${task.checked ? 'checked' : ''} class="${decorEditOther}" type="checkbox"/>${value}
-                                <button id="${task.id}" name="delete" class="delete btn btn-danger${decorEditOther}">x</button>
-                                </li>`;
+  $(document).on('keypress', event => {
+    if (event.which === KEY_ENTER) {
+      $todoAdd.click();
+    }
+  });
 
-        // Change checkbox for all tasks
-        const statusCheckedAll = array.every(element => element.checked === true);
+  $todosList.on('keypress', '.edit-input', event => {
+    if (event.which === KEY_ENTER) {
+      $('input:focus').focusout();
+    }
+  });
 
-        $checkedAll.prop('checked', statusCheckedAll);
-        });
-        $tasksList.append(stringForRender);
+  const checkInput = function(value) {
+    if (!value) {
+      return true;
+    }
 
-        // Counter active & complete tasks
-        const completeTask = (array.filter(el => el.checked === true)).length;
-        const activeTask = array.length - completeTask;
-        
-        if (array.length > 0) {
-            $tasksList.append(`</br><div class="bg-warning">Сomplete:${completeTask} 
-                                \n Active:${activeTask} </div>`);
-          }
-        addNewPage();
-        console.log( array );
-    };
+    return false;
+  };
 
-    // Add task
-    $("#task-add").on("click", function(){
-        const value = _.escape($tasksInput.val().trim());
-        // checkInput(value);
-        
-        if(!value || checkInput(value) === true) {
-            $tasksInput.val("");
-            return false;
-        }
-        
-        const task = {};
-        const uniq = Math.floor((Math.random() * 10000) + 1);
-        
-        task.id = uniq;
-        task.value = value;
-        task.checked = false;
-        task.edit = false;
+  const countOnPages = function() {
+    const allTodos = currentPage * TODOS_ON_PAGE;
+    const firstPage = allTodos - TODOS_ON_PAGE;
+    const lastPage = firstPage + TODOS_ON_PAGE;
+    const filterTodo = filtration();
 
-        array.push(task);
-        currentPage = callCurrentPage();
+    return filterTodo.slice(firstPage, lastPage);
+  };
 
-        $tasksInput.val("");
-        displayNotification();
-        render();
-    });
+  const paginationControl = function() {
+    $pagination.empty();
+    const numPages = getLastPage();
 
-    // Change checkbox for current task
-    $tasksList.on('click', 'input[type=checkbox]', event => {
-        const clickId = Number($(event.currentTarget).attr('id'));
+    let stringLi = '';
 
-        array.forEach(task => {
-        if (task.id === clickId) {
-            task.checked = !task.checked;
-        }
-        });
-        // currentPage = callCurrentPage();
-        render();
-    });
-  
-    // Change checkbox for all tasks
-    $checkedAll.on('click', event => {
-        const generalStatus = $(event.currentTarget).is(':checked');
+    for (let i = 1; i <= numPages; i++) {
+      const activeCurrentPage = Number(currentPage) === i ? 'active' : '';
 
-        array.forEach(task => {
-            task.checked = generalStatus;
-        });
-        currentPage = callCurrentPage();
-        render();
-    });
-
-    // Delete
-    $tasksList.on('click', 'button[name=delete]', event => {
-        const clickId = Number($(event.currentTarget).attr('id'));
-
-        let delConfirm = confirm("Are you sure?");
-        if (delConfirm){
-            array = array.filter(task => task.id != clickId);
-            currentPage = callCurrentPage();
-            render();
-        }
-        
-    })
-    
-    // Delete all completed
-    $($deleteCompleted).click(() => {
-        array = array.filter(task => task.checked === false);
-        currentPage = callCurrentPage();
-        render();
-    });
-
-    // DoubleClick for change value
-    $tasksList.on('dblclick', 'li', event => {
-        const clickId = Number($(event.currentTarget).attr('id'));
-        
-        // const $editInput = $('#editInput');
-        // $("li[id^='edit-input-']").focus();
-        $('li[id="edit-input-'+clickId+'"]').focus();
-
-        array.forEach(task => {
-        if (task.id === clickId) {
-            task.edit = true;
-        }
-        });
-        render();
-    });
-
-    // Blur for change value
-    $tasksList.on('blur', '.edit-input', event => {
-        const clickId = Number($(event.currentTarget).parent().attr('id'));
-        const newValue = _.escape($(event.currentTarget).val().trim());
-        // console.log($(event.currentTarget).parent());
-        // console.log(newValue);
-        let value = newValue;
-        if(newValue || checkInput(value) === false) {
-            array.forEach(task => {
-            if (task.id === clickId) {
-                task.value = newValue;
-                task.edit = false;
-            }
-            });
-            render();
-        } else {$(event.currentTarget).focus()}
-    });
-
-    // $( "#target" ).click(function() {
-    //     alert( "Handler for .click() called." );
-    // });
-
-    // Change current page
-    // let currentPageClick = function (){}
-    // $pagination.on("click", '.page-item', currentPageClick)
-    $pagination.on("click", '#page-next', event => {
-        if ( currentPage < Math.ceil(filtration().length / TASKS_ON_PAGE) ) {
-            ++currentPage;
-        }
-        render();
-        console.log(currentPage);
-    });
-    $pagination.on("click", '#page-previous', event => {
-        if ( +currentPage > 1 ) {
-            --currentPage;
-        }
-        render();
-        console.log(currentPage);
-    });
-
-    $pagination.on("click", "li[id^='li-page-']", event => {
-        currentPage = $(event.currentTarget).children().text();
-        console.log(currentPage);
-        render();
-    });
-    
-    // Pagination
-    const addNewPage = function() {
-        $pagination.empty();
-        const condition = Math.ceil(filtration().length / TASKS_ON_PAGE);
-        let stringPagination = '';
-        let stringLi = '';
-        
-        for (let i = 1; i <= condition ; i++){
-            let activeCurrentPage = (+currentPage === i) ? "" : "active";
-            stringLi += `
-            <li id="li-page-${i}" class="page-item ${activeCurrentPage}">
-                <a id="a-page-${i}" class="page-link">${i}</a>
-            </li>`;
-        }
-        let disablePrevious = (+currentPage > 1) ? "" : "disabled";
-        let disableNext = (+currentPage === +condition) ? "disabled" : "";
-        
-        stringPagination = `        
-        <li id="page-previous" class="page-item ${disablePrevious}">
-            <a class="page-link" tabindex="-1" aria-disabled="true">Previous</a>
-        </li>
-        ${stringLi}
-        <li id="page-next" class="page-item ${disableNext}">
-            <a class="page-link">Next</a>
+      stringLi += `
+        <li id="li-page-${i}" class="page-item ${activeCurrentPage}">
+        <a id="a-page-${i}" class="page-link">${i}</a>
         </li>`;
-        
-        $pagination.append(stringPagination);
-        
-        // <li class="page-item disabled">
-        //     <a class="page-link" href="javascript:void(0)" tabindex="-1" aria-disabled="true">Previous</a>
-        // </li>
-        // <li class="page-item"><a class="page-link" href="javascript:void(0)">1</a></li>
-        // <li class="page-item">
-        //     <a class="page-link" href="javascript:void(0)">Next</a>
-        // </li>
+    }
 
-    };
+    const numPage = Number(currentPage);
+    const disablePrevious = numPage > 1 ? '' : 'disabled';
+    const disableNext = numPage === Number(numPages) ? 'disabled' : '';
 
-})
+    const stringPagination = `
+      <li id="page-previous" class="page-item ${disablePrevious}">
+      <a class="page-link" tabindex="-1" aria-disabled="true">Previous</a>
+      </li>
+      ${stringLi}
+      <li id="page-next" class="page-item ${disableNext}">
+      <a class="page-link">Next</a>
+      </li>`;
+
+    $pagination.append(stringPagination);
+  };
+
+  const render = function() {
+    $todosList.empty();
+    $checkedAll.prop('checked', false);
+    const filterTodos = countOnPages();
+
+    let stringForRender = '';
+
+    filterTodos.forEach(todo => {
+      const notEdit = !todo.edit;
+      const checked = todo.checked ? 'text-decoration-line' : '';
+      const classEdit = 'edit-input-';
+      const showEdit = todo.edit ? `${classEdit}show` : `${classEdit}hide`;
+      const todoValue = todo.edit ? '' : `${todo.value}`;
+      const hideObjects = notEdit ? ' ' : `${classEdit}hide`;
+      const autofocus = todo.edit ? 'autofocus' : '';
+
+      stringForRender += `<li 
+        id="${todo.id}" class="list-group-item ${checked}">
+        <input type="text" 
+        id="edit-input-${todo.id}" 
+        class="edit-input ${showEdit}"
+        value="${todo.value}"
+        ${autofocus}/>
+        <input id="${todo.id}" ${todo.checked ? 'checked' : ''} 
+        class="${hideObjects}" type="checkbox"/>${todoValue}
+        <button id="${todo.id}" name="delete" 
+        class="delete btn btn-danger ${hideObjects}">x</button>
+        </li>`;
+
+      const statusCheckedAll = todos.every(element => element.checked === true);
+
+      $checkedAll.prop('checked', statusCheckedAll);
+    });
+
+    $todosList.append(stringForRender);
+
+    if (todos.length > 0) {
+      const completeTodo = todos.filter(el => el.checked === true);
+      const activeTodo = todos.length - completeTodo.length;
+
+      $todosList.append(`</br>
+                         <div class="bg-warning">Сomplete:${completeTodo.length}
+                         \n Active:${activeTodo} 
+                         </div>`);
+    }
+    paginationControl();
+  };
+
+  const activeFilter = function() {
+    filter = $(this).attr('id');
+    currentPage = getLastPage();
+    $('#filter > input').removeClass('active');
+    $(this).addClass('active');
+    render();
+  };
+
+  $all.click(activeFilter);
+  $active.click(activeFilter);
+  $completed.click(activeFilter);
+
+  const add = function() {
+    const value = _.escape($todosInput.val().trim());
+
+    if (!value || checkInput(value) === true) {
+      $todosInput.val('');
+
+      return false;
+    }
+
+    const todo = {};
+
+    todo.id = Math.random();
+    todo.value = value;
+    todo.checked = false;
+    todo.edit = false;
+
+    todos.push(todo);
+    currentPage = getLastPage();
+
+    $todosInput.val('');
+    displayNotificationIfTodosEmpty();
+    render();
+
+    return $todosInput.val('');
+  };
+
+  $todoAdd.on('click', add);
+
+  $todosList.on('click', 'input[type=checkbox]', event => {
+    const clickId = Number($(event.currentTarget).attr('id'));
+
+    todos.forEach(todo => {
+      if (todo.id === clickId) {
+        todo.checked = !todo.checked;
+      }
+    });
+    callCurrentPage();
+    render();
+  });
+
+  $checkedAll.on('click', event => {
+    const generalStatus = $(event.currentTarget).is(':checked');
+
+    todos.forEach(todo => {
+      todo.checked = generalStatus;
+    });
+    currentPage = getLastPage();
+    render();
+  });
+
+  $todosList.on('click', 'button[name=delete]', event => {
+    const clickId = Number($(event.currentTarget).attr('id'));
+
+    todos = todos.filter(todo => todo.id !== clickId);
+    callCurrentPage();
+    render();
+  });
+
+  $($deleteCompleted).click(() => {
+    todos = todos.filter(todo => todo.checked === false);
+    currentPage = getLastPage();
+    render();
+  });
+
+  $todosList.on('dblclick', 'li', event => {
+    const clickId = Number($(event.currentTarget).attr('id'));
+
+    $(`li[id="edit-input-${clickId}"]`).focus();
+
+    todos.forEach(todo => {
+      if (todo.id === clickId) {
+        todo.edit = true;
+      }
+    });
+    render();
+  });
+
+  $todosList.on('blur', '.edit-input', event => {
+    let clickId = $(event.currentTarget).parent();
+
+    const newValue = _.escape($(event.currentTarget).val()).trim();
+
+    clickId = Number(clickId.attr('id'));
+    const value = newValue;
+
+    if (newValue || checkInput(value) === false) {
+      todos.forEach(todo => {
+        if (todo.id === clickId) {
+          todo.value = newValue;
+          todo.edit = false;
+        }
+      });
+      render();
+    } else {
+      $(event.currentTarget).focus();
+    }
+  });
+
+  const pageNextClick = function() {
+    if (currentPage < getLastPage()) {
+      ++currentPage;
+    }
+    render();
+  };
+
+  const pagePreviousClick = function() {
+    if (Number(currentPage) > 1) {
+      --currentPage;
+    }
+    render();
+  };
+
+  $pagination.on('click', `li[id^='li-page-']`, event => {
+    currentPage = $(event.currentTarget).children();
+
+    currentPage = currentPage.text();
+    render();
+  });
+
+  $pagination.on('click', '#page-next', pageNextClick);
+  $pagination.on('click', '#page-previous', pagePreviousClick);
+});

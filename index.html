@@ -20,21 +20,21 @@
 </br>
 <div id="container" class="form-group">
     <div id="input">
-        <input id="tasks-input" type="text" class="form-control" placeholder="Your task">
-        <button id="task-add" class="btn btn-success lg">Add</button>
+        <input id="todos-input" type="text" class="form-control" placeholder="Your todo">
+        <button id="todo-add" class="btn btn-success lg">Add</button>
     </div>
     </br>
-    <div>
-        <input id="checked-all" class="checkbox" type="checkbox">SET ALL as completed</input>
-        <input id="all" type="button" class="btn btn-secondary" value="All">
-        <input id="active" type="button" class="btn btn-primary" value="Active">
-        <input id="completed" type="button" class="btn btn-success" value="Completed">    
+    <div id="filter">
+        <input id="checked-all" class="checkbox" type="checkbox">checked ALL</input>
+        <input id="all" type="button" class="btn btn-outline-primary active" value="All">
+        <input id="active" type="button" class="btn btn-outline-primary" value="Active">
+        <input id="completed" type="button" class="btn btn-outline-primary" value="Completed">
         <input id="delete-completed" type="button" class="btn btn-danger" value="Delete completed">
     </div>
-    <div id="tasks">
+    <div id="todos">
         </br>
-        <div id="notification" class="bg-info text-center">Task list is empty</div>
-        <ul id="tasks-list">
+        <div id="notification" class="bg-info text-center">Todo list is empty</div>
+        <ul id="todos-list">
         </ul>
     </div>
     <nav aria-label="Navigation">
