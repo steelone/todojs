@@ -232,7 +232,7 @@ $(document).ready(() => {
 
   $($deleteCompleted).click(() => {
     todos = todos.filter(todo => todo.checked === false);
-    currentPage = getLastPage();
+    callCurrentPage();
     render();
   });
 
